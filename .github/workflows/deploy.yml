@@ -22,10 +22,12 @@ jobs:
 
 
       - name: Build and push Docker image
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         run: |
-          docker build -t ${DOCKERHUB_USERNAME}/myapp:latest .
-          docker push ${DOCKERHUB_USERNAME}/myapp:latest
-  
+          docker build -t $DOCKERHUB_USERNAME/myapp:latest .
+          docker push $DOCKERHUB_USERNAME/myapp:latest
+
 
       - name: Deploy to Remote Server
         env:
