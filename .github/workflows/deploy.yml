@@ -32,7 +32,7 @@ jobs:
         run: |
           echo "${SSH_PRIVATE_KEY}" > key.pem
           chmod 600 key.pem
-          ssh -i key.pem -o StrictHostKeyChecking=no aluno@201.23.3.86 << EOF
+          ssh -i key.pem -o StrictHostKeyChecking=no 8104@201.23.3.86 << EOF
             docker pull ${DOCKERHUB_USERNAME}/myapp:latest
             docker stop myapp || true
             docker rm myapp || true
