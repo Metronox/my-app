@@ -34,7 +34,7 @@ jobs:
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
-          echo "$SSH_PRIVATE_KEY" > key.pem
+          echo -e "${SSH_PRIVATE_KEY}" > key.pem
           chmod 600 key.pem
           ssh -i key.pem -o StrictHostKeyChecking=no 8104@201.23.3.86 << EOF
             docker pull $DOCKERHUB_USERNAME/myapp:latest
