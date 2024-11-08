@@ -1,0 +1,40 @@
+name: Deploy to Server and DockerHub
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Log in to DockerHub
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+        run: |
+          echo "${DOCKERHUB_PASSWORD}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t myapp:latest .
+          docker tag myapp:latest ${DOCKERHUB_USERNAME}/myapp:latest
+          docker push ${DOCKERHUB_USERNAME}/myapp:latest
+
+      - name: Deploy to Remote Server
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          echo "${SSH_PRIVATE_KEY}" > key.pem
+          chmod 600 key.pem
+          ssh -i key.pem -o StrictHostKeyChecking=no aluno@201.23.3.86 << EOF
+            docker pull ${DOCKERHUB_USERNAME}/myapp:latest
+            docker stop myapp || true
+            docker rm myapp || true
+            docker run -d -p 5000:5000 --name myapp ${DOCKERHUB_USERNAME}/myapp:latest
+          EOF
