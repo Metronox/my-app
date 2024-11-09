@@ -28,7 +28,7 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/minha-aplicacao:${{ github.sha }}
 
       - name: Deploy on Server
-        uses: appleboy/ssh-action@v0.1.10
+        uses: appleboy/ssh-action@v0.1.6
         with:
           host: 201.23.3.86
           username: aluno
