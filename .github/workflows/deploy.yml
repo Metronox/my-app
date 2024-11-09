@@ -1,44 +1,41 @@
-name: Deploy to Server and DockerHub
+name: Deploy Application
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Log in to DockerHub
-        env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Log into DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push Docker image
         run: |
-          echo "${DOCKERHUB_PASSWORD}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/minha-aplicacao:${{ github.sha }} .
+          docker push ${{ secrets.DOCKER_USERNAME }}/minha-aplicacao:${{ github.sha }}
 
-
-      - name: Build and push Docker image
-        env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-        run: |
-          docker build -t $DOCKERHUB_USERNAME/myapp:latest .
-          docker push $DOCKERHUB_USERNAME/myapp:latest
-
-
-
-      - name: Deploy to Remote Server
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          echo -e "${SSH_PRIVATE_KEY}" > key.pem
-          chmod 600 key.pem
-          ssh -i key.pem -o StrictHostKeyChecking=no 8104@201.23.3.86 << EOF
-            docker pull $DOCKERHUB_USERNAME/myapp:latest
-            docker stop myapp || true
-            docker rm myapp || true
-            docker run -d -p 5000:5000 --name myapp $DOCKERHUB_USERNAME/myapp:latest
-          EOF
+      - name: Deploy on Server
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: 201.23.3.86
+          username: aluno
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          script: |
+            docker pull ${{ secrets.DOCKER_USERNAME }}/minha-aplicacao:${{ github.sha }}
+            docker stop app-node || true
+            docker rm app-node || true
+            docker run -d --name app-node -p 8104:8104 ${{ secrets.DOCKER_USERNAME }}/minha-aplicacao:${{ github.sha }}
