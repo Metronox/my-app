@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = 8104;
+const port = process.env.PORT || 8104; // Usa PORT de variáveis de ambiente, com fallback para 8104
 
 app.get("/", (req, res) => {
   res.send("Shadow o ouriço");
