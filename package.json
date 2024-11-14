@@ -1,14 +1,14 @@
 {
-  "name": "wo",
+  "name": "my-app",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "dependencies": {
     "express": "^4.21.1",
-    "flask": "^0.2.10",
-    "wo": "file:"
+    "my-app": "file:"
   },
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
