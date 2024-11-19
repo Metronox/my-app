@@ -33,11 +33,10 @@ jobs:
           host: 201.23.3.86
           username: aluno
           key: ${{ secrets.SSH_KEY }}
-          port: 2222
+          port: 22
           script: |
+            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             docker pull ${{ secrets.DOCKER_USERNAME }}/minha-aplicacao:${{ github.sha }}
             docker stop app-node || true
             docker rm app-node || true
-            docker run -d --name app-node -p 8104:8104 \
-              -e PORT=8104 \
-              ${{ secrets.DOCKER_USERNAME }}/minha-aplicacao:${{ github.sha }}
+            docker run -d --name app-node -p 8104:80 \ ${{ secrets.DOCKER_USERNAME }}/minha-aplicacao:${{ github.sha }}
