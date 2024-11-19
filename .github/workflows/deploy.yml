@@ -39,4 +39,4 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/minha-aplicacao:${{ github.sha }}
             docker stop app-node || true
             docker rm app-node || true
-            docker run -d --name app-node -p 8104:80 \ ${{ secrets.DOCKER_USERNAME }}/minha-aplicacao:${{ github.sha }}
+            docker run -d --name app-node -p 8104:80 ${{ secrets.DOCKER_USERNAME }}/minha-aplicacao:${{ github.sha }}
