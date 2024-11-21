@@ -3,7 +3,7 @@ const app = express();
 const port = process.env.PORT || 8104;
 
 app.get("/", (req, res) => {
-  res.send("Shadow o ouriço é um meme");
+  res.send("Sonic o ouriço não é um meme");
 });
 
 app.listen(port, () => {
